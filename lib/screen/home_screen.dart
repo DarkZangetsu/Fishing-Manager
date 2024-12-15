@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:peche/screen/view/catch_management_view.dart';
 import 'package:peche/screen/view/categorie_pecheur_view.dart';
+import 'package:peche/screen/view/lieu_peche_management_view.dart';
 import 'package:peche/screen/view/statistics_view.dart';
 import 'package:peche/screen/view/user_management_view.dart';
 import '../utils/app_colors.dart';
@@ -27,7 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
     CatchManagementView(),
     StatisticsView(),
     UserManagementView(),
-    CategoriePecheurView()
+    CategoriePecheurView(),
+    LieuPecheManagementView(),
   ];
 
   final List<Map<String, dynamic>> _menuItems = [
@@ -56,17 +58,20 @@ class _HomeScreenState extends State<HomeScreen> {
       'label': 'Statistiques',
       'route': 4
     },
-
     {
       'icon': Icons.verified_user,
       'label': 'Utilisateurs',
       'route': 5
     },
-
     {
       'icon': Icons.category_sharp,
       'label': 'Categorie',
       'route': 6
+    },
+    {
+      'icon': Icons.water_outlined, // Nouvelle icône pour les lieux de pêche
+      'label': 'Lieux de Pêche',
+      'route': 7 // Correspond à l'index dans _screens
     },
   ];
 
@@ -176,4 +181,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

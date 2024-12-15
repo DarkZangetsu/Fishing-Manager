@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:peche/provider/categoriePecheurProvider.dart';
+import 'package:peche/provider/lieuPecheProvider.dart';
 import 'package:peche/provider/pecheurProvider.dart';
 import 'package:peche/provider/pecheurTechniqueProvider.dart';
 import 'package:peche/provider/techniquePecheProvider.dart';
@@ -17,6 +18,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => PecheurProvider()),
         ChangeNotifierProvider(create: (context) => CategoriePecheurProvider()),
         ChangeNotifierProvider(create: (context) => TechniquePecheProvider()),
+        ChangeNotifierProvider(create: (context) => LieuPecheProvider()),
       ],
       child: const MyApp(),
     ),
