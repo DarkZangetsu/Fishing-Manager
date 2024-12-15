@@ -9,6 +9,7 @@ import '../models/conditionmeteo.dart';
 import '../models/lieupeche.dart';
 import '../models/pecheur.dart';
 import '../db/sqlhelper.dart';
+import '../models/pecheurtechnique.dart';
 import '../models/techniquepeche.dart';
 
 class DatabaseHelper {
@@ -262,6 +263,13 @@ class DatabaseHelper {
       'niveau_maitrise': niveauMaitrise
     });
   }
+
+  Future<List<PecheurTechnique>> obtenirPecheurTechnique({String? where, List<dynamic>? whereArgs}) async {
+    final result = await _sqlHelper.consulter('pecheur_technique', where: where, whereArgs: whereArgs);
+    return result.map((map) => PecheurTechnique.fromMap(map)).toList();
+  }
+
+
 
   Future<int> supprimerPecheurTechnique(int idPecheur, int idTechnique) async {
     return await _sqlHelper.supprimer(

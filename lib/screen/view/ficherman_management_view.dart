@@ -695,6 +695,7 @@ class _FishermanManagementViewState extends State<FishermanManagementView> {
       ),
     );
   }
+
   Widget _buildDetailRow({
     required IconData icon,
     required String label,
