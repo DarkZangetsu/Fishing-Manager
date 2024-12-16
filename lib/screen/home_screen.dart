@@ -47,12 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
           MenuItem(
               icon: Icons.category_sharp,
               label: 'Categorie de Pêcheurs',
-              route: 6
+              route: 5
           ),
           MenuItem(
               icon: Icons.phishing_outlined,
               label: 'Techniques de Pêche',
-              route: 8
+              route: 7
           ),
         ]
     ),
@@ -79,12 +79,12 @@ class _HomeScreenState extends State<HomeScreen> {
           MenuItem(
               icon: Icons.water_outlined,
               label: 'Lieux de Pêche',
-              route: 7
+              route: 6
           ),
           MenuItem(
               icon: Icons.wb_sunny_outlined,
               label: 'Conditions Météo',
-              route: 9
+              route: 8
           ),
         ]
     ),
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
           MenuItem(
               icon: Icons.verified_user,
               label: 'Utilisateurs',
-              route: 5
+              route: 4
           ),
         ]
     ),

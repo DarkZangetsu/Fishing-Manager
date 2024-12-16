@@ -17,6 +17,7 @@ import '../../provider/pecheurProvider.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_style.dart';
 
+
 class CaptureManagementView extends StatefulWidget {
   const CaptureManagementView({Key? key}) : super(key: key);
 
@@ -31,6 +32,8 @@ class _CaptureManagementViewState extends State<CaptureManagementView> {
   final TextEditingController _poidsController = TextEditingController();
   final TextEditingController _tailleController = TextEditingController();
   final TextEditingController _observationsController = TextEditingController();
+
+
 
   // State Variables
   DateTime? _dateCapture;
@@ -537,6 +540,303 @@ class _CaptureManagementViewState extends State<CaptureManagementView> {
     );
   }
 
+  List<Capture> _filterCaptures(List<Capture> captures) {
+    return captures.where((capture) {
+      // Filter by date range
+      if (_startDate != null && _endDate != null) {
+        if (capture.dateCapture == null ||
+            capture.dateCapture!.isBefore(_startDate!) ||
+            capture.dateCapture!.isAfter(_endDate!)) {
+          return false;
+        }
+      }
+
+      // Filter by lieux (fishing locations)
+      if (_selectedLieux.isNotEmpty) {
+        if (capture.idLieu == null || !_selectedLieux.contains(capture.idLieu)) {
+          return false;
+        }
+      }
+
+      // Filter by destinations
+      if (_selectedDestinations.isNotEmpty) {
+        if (capture.destination == null ||
+            !_selectedDestinations.contains(capture.destination)) {
+          return false;
+        }
+      }
+
+      // Filter by techniques
+      if (_selectedTechniques.isNotEmpty) {
+        if (capture.idTechnique == null ||
+            !_selectedTechniques.contains(capture.idTechnique)) {
+          return false;
+        }
+      }
+
+      return true;
+    }).toList();
+  }
+
+  void _showFilterOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Container(
+          height: MediaQuery.of(context).size.height * 0.9,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Filtrer les Captures',
+                style: AppStyles.titleStyle.copyWith(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+
+              // Date Range Filter
+              _buildDateRangeFilter(setState),
+              const SizedBox(height: 15),
+
+              // Lieux (Fishing Locations) Filter
+              _buildLieuxFilter(setState),
+              const SizedBox(height: 15),
+
+              // Destinations Filter
+              _buildDestinationFilter(setState),
+              const SizedBox(height: 15),
+
+              // Techniques Filter
+              _buildTechniquesFilter(setState),
+              const SizedBox(height: 20),
+
+              // Apply and Reset Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[200],
+                        foregroundColor: Colors.black,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _startDate = null;
+                          _endDate = null;
+                          _selectedLieux.clear();
+                          _selectedDestinations.clear();
+                          _selectedTechniques.clear();
+                        });
+                        this.setState(() {});
+                      },
+                      child: const Text('Réinitialiser'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: AppStyles.primaryButtonStyle,
+                      onPressed: () {
+                        Navigator.pop(context);
+                        this.setState(() {});
+                      },
+                      child: const Text('Appliquer'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateRangeFilter(StateSetter setState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Période de Capture',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _startDate ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _startDate = picked;
+                    });
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Date de début',
+                      hintText: _startDate != null
+                          ? DateFormat('dd/MM/yyyy').format(_startDate!)
+                          : 'Début',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _endDate ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _endDate = picked;
+                    });
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Date de fin',
+                      hintText: _endDate != null
+                          ? DateFormat('dd/MM/yyyy').format(_endDate!)
+                          : 'Fin',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLieuxFilter(StateSetter setState) {
+    return Consumer<LieuPecheProvider>(
+      builder: (context, lieuProvider, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Lieux de Pêche',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+            Wrap(
+              spacing: 8,
+              children: lieuProvider.lieux.map((lieu) {
+                final isSelected = _selectedLieux.contains(lieu.idLieu);
+                return ChoiceChip(
+                  label: Text(lieu.nom),
+                  selected: isSelected,
+                  onSelected: (bool selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedLieux.add(lieu.idLieu!);
+                      } else {
+                        _selectedLieux.remove(lieu.idLieu);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDestinationFilter(StateSetter setState) {
+    final destinations = ['consommation', 'vente', 'recherche', 'autres'];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Destinations',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+        ),
+        Wrap(
+          spacing: 8,
+          children: destinations.map((destination) {
+            final isSelected = _selectedDestinations.contains(destination);
+            return ChoiceChip(
+              label: Text(destination),
+              selected: isSelected,
+              onSelected: (bool selected) {
+                setState(() {
+                  if (selected) {
+                    _selectedDestinations.add(destination);
+                  } else {
+                    _selectedDestinations.remove(destination);
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTechniquesFilter(StateSetter setState) {
+    return Consumer<TechniquePecheProvider>(
+      builder: (context, techniqueProvider, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Techniques de Pêche'),
+            Wrap(
+              children: techniqueProvider.techniques.map((technique) {
+                final isSelected = _selectedTechniques.contains(technique.idTechnique);
+                return ChoiceChip(
+                  label: Text(technique.nom), // Display technique name
+                  selected: isSelected,
+                  onSelected: (bool selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedTechniques.add(technique.idTechnique!);
+                      } else {
+                        _selectedTechniques.remove(technique.idTechnique);
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
 // Method to save the capture
   Future<void> _saveCapture(BuildContext context) async {
     final provider = context.read<CaptureProvider>();
@@ -648,22 +948,33 @@ class _CaptureManagementViewState extends State<CaptureManagementView> {
     super.dispose();
   }
 
+  DateTime? _startDate;
+  DateTime? _endDate;
+  List<int> _selectedLieux = [];
+  List<String> _selectedDestinations = [];
+  List<int> _selectedTechniques = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text('Gestion des Captures'),
-        centerTitle: true,
         titleTextStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.black87
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.filter_list, color: AppColors.primary),
+            onPressed: () => _showFilterOptions(context),
+          ),
+        ],
       ),
       body: Consumer<CaptureProvider>(
         builder: (context, provider, child) {
-          final captures = provider.captures;
+          final captures = _filterCaptures(provider.captures);
 
           if (captures.isEmpty) {
             return _buildEmptyState();

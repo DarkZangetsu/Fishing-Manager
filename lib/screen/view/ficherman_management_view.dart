@@ -35,6 +35,7 @@ class _FishermanManagementViewState extends State<FishermanManagementView> {
   Pecheur? _selectedPecheur;
   bool _isEditing = false;
 
+
   @override
   void initState() {
     super.initState();
