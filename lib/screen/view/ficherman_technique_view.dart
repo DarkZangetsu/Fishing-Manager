@@ -86,7 +86,7 @@ class _FishermanTechniqueViewState extends State<FishermanTechniqueView> {
                         onPressed: () => Navigator.pop(context),
                       ),
                       Text(
-                        'Ajouter Technique de Pêche',
+                        'Attribuer Technique',
                         style: AppStyles.titleStyle.copyWith(fontSize: 20),
                       ),
                       const SizedBox(width: 48),
@@ -121,19 +121,15 @@ class _FishermanTechniqueViewState extends State<FishermanTechniqueView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Dropdown pour sélectionner le pêcheur
           _buildPecheurDropdown(context, setState),
           const SizedBox(height: 15),
 
-          // Dropdown pour sélectionner la technique de pêche
           _buildTechniqueDropdown(context, setState),
           const SizedBox(height: 15),
 
-          // Date d'apprentissage
           _buildDateApprentissageField(context, setState),
           const SizedBox(height: 15),
 
-          // Dropdown pour le niveau de maîtrise
           _buildNiveauMaitriseDropdown(setState),
           const SizedBox(height: 20),
 

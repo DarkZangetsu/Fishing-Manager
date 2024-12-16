@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:peche/provider/categoriePecheurProvider.dart';
+import 'package:peche/provider/conditionMeteoProvider.dart';
 import 'package:peche/provider/lieuPecheProvider.dart';
 import 'package:peche/provider/pecheurProvider.dart';
 import 'package:peche/provider/pecheurTechniqueProvider.dart';
 import 'package:peche/provider/techniquePecheProvider.dart';
 import 'package:peche/provider/utilisateurProvider.dart';
-import 'package:peche/screen/view/technique_peche_management_view.dart';
 import 'package:provider/provider.dart';
 import './routes/app_routes.dart';
 import './utils/app_colors.dart';
@@ -21,6 +20,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => TechniquePecheProvider()),
         ChangeNotifierProvider(create: (context) => LieuPecheProvider()),
         ChangeNotifierProvider(create: (context) => PecheurTechniqueProvider()),
+        ChangeNotifierProvider(create: (context) => ConditionMeteoProvider()),
       ],
       child: const MyApp(),
     ),
