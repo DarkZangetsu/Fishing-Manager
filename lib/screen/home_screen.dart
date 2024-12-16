@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
     DashboardView(),
     FishermanManagementView(),
     TechniquePecheManagementView(),
-    CatchManagementView(),
+    CaptureManagementView(),
     StatisticsView(),
     UserManagementView(),
     CategoriePecheurView(),
