@@ -4,7 +4,6 @@ import 'package:peche/screen/view/categorie_pecheur_view.dart';
 import 'package:peche/screen/view/condition_meteo_view.dart';
 import 'package:peche/screen/view/ficherman_technique_view.dart';
 import 'package:peche/screen/view/lieu_peche_management_view.dart';
-import 'package:peche/screen/view/statistics_view.dart';
 import 'package:peche/screen/view/user_management_view.dart';
 import '../utils/app_colors.dart';
 import 'view/dashboard_view.dart';
@@ -89,17 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ]
     ),
-    MenuGroup(
-        groupName: 'Rapports',
-        groupIcon: Icons.bar_chart_outlined,
-        items: [
-          MenuItem(
-              icon: Icons.bar_chart_outlined,
-              label: 'Statistiques',
-              route: 4
-          ),
-        ]
-    ),
+
     MenuGroup(
         groupName: 'Administration',
         groupIcon: Icons.admin_panel_settings,
@@ -119,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
     FishermanManagementView(),
     TechniquePecheManagementView(),
     CaptureManagementView(),
-    StatisticsView(),
     UserManagementView(),
     CategoriePecheurView(),
     LieuPecheManagementView(),

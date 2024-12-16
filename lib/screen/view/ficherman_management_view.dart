@@ -446,8 +446,9 @@ class _FishermanManagementViewState extends State<FishermanManagementView> {
       statut: _selectedStatut ?? 'actif',
     );
 
+
     _isEditing
-    ? provider.modifierPecheur(pecheur)
+        ? provider.modifierPecheur(pecheur)
         : provider.ajouterPecheur(pecheur);
 
     Navigator.pop(context);

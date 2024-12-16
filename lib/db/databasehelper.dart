@@ -278,4 +278,125 @@ class DatabaseHelper {
         [idPecheur, idTechnique]
     );
   }
+
+
+  Future<Map<String, dynamic>> obtenirStatistiquesCapturesGlobales() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    final result = await db.rawQuery('''
+      SELECT 
+        COUNT(*) as nombre_total_captures,
+        SUM(quantite) as quantite_totale,
+        SUM(poids) as poids_total,
+        AVG(poids) as poids_moyen,
+        strftime('%Y', date_capture) as annee
+      FROM capture
+    ''');
+
+    return result.isNotEmpty ? result.first : {};
+  }
+
+  // Statistiques de captures par destination
+  Future<List<Map<String, dynamic>>> obtenirStatistiquesCapturesParDestination() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    return await db.rawQuery('''
+      SELECT 
+        destination, 
+        COUNT(*) as nombre_captures, 
+        SUM(quantite) as quantite_totale, 
+        SUM(poids) as poids_total
+      FROM capture
+      GROUP BY destination
+    ''');
+  }
+
+  // Statistiques de captures par lieu de pêche
+  Future<List<Map<String, dynamic>>> obtenirStatistiquesCapturesParLieu() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    return await db.rawQuery('''
+      SELECT 
+        lp.nom as nom_lieu, 
+        COUNT(c.id_capture) as nombre_captures, 
+        SUM(c.quantite) as quantite_totale,
+        SUM(c.poids) as poids_total
+      FROM capture c
+      JOIN lieu_peche lp ON c.id_lieu = lp.id_lieu
+      GROUP BY lp.id_lieu
+      ORDER BY nombre_captures DESC
+    ''');
+  }
+
+  // Statistiques de captures par technique de pêche
+  Future<List<Map<String, dynamic>>> obtenirStatistiquesCapturesParTechnique() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    return await db.rawQuery('''
+      SELECT 
+        tp.nom as technique, 
+        COUNT(c.id_capture) as nombre_captures, 
+        SUM(c.quantite) as quantite_totale,
+        SUM(c.poids) as poids_total
+      FROM capture c
+      JOIN technique_peche tp ON c.id_technique = tp.id_technique
+      GROUP BY tp.id_technique
+      ORDER BY nombre_captures DESC
+    ''');
+  }
+
+  // Statistiques des pêcheurs
+  Future<Map<String, dynamic>> obtenirStatistiquesPecheurs() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    final result = await db.rawQuery('''
+      SELECT 
+        COUNT(*) as nombre_total_pecheurs,
+        SUM(CASE WHEN statut = 'actif' THEN 1 ELSE 0 END) as pecheurs_actifs,
+        SUM(CASE WHEN statut = 'suspendu' THEN 1 ELSE 0 END) as pecheurs_suspendus,
+        (SELECT COUNT(DISTINCT id_pecheur) FROM capture) as pecheurs_ayant_capture
+      FROM pecheur
+    ''');
+
+    return result.isNotEmpty ? result.first : {};
+  }
+
+  // Évolution des captures au fil du temps
+  Future<List<Map<String, dynamic>>> obtenirEvolutionCapturesParMois() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    return await db.rawQuery('''
+      SELECT 
+        strftime('%Y-%m', date_capture) as mois, 
+        COUNT(*) as nombre_captures, 
+        SUM(quantite) as quantite_totale,
+        SUM(poids) as poids_total
+      FROM capture
+      GROUP BY mois
+      ORDER BY mois
+    ''');
+  }
+
+  // Répartition des pêcheurs par catégorie
+  Future<List<Map<String, dynamic>>> obtenirRepartitionPecheursParCategorie() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    return await db.rawQuery('''
+      SELECT 
+        cp.libelle as categorie, 
+        COUNT(p.id_pecheur) as nombre_pecheurs
+      FROM categorie_pecheur cp
+      LEFT JOIN pecheur p ON cp.id_categorie = p.id_categorie
+      GROUP BY cp.id_categorie
+      ORDER BY nombre_pecheurs DESC
+    ''');
+  }
+
+  // Conditions météorologiques lors des captures
+  Future<List<Map<String, dynamic>>> obtenirStatistiquesConditionsMeteo() async {
+    final db = await _sqlHelper.baseDeDonnees;
+    return await db.rawQuery('''
+      SELECT 
+        etat_general, 
+        COUNT(*) as nombre_captures,
+        AVG(temperature) as temperature_moyenne,
+        AVG(vitesse_vent) as vitesse_vent_moyenne
+      FROM capture c
+      JOIN condition_meteo cm ON c.id_meteo = cm.id_meteo
+      GROUP BY etat_general
+    ''');
+  }
 }
