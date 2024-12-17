@@ -20,23 +20,60 @@ class DatabaseHelper {
     final db = await _sqlHelper.baseDeDonnees;
     String hashedPassword = _hashPassword(motDePasse);
 
+    try {
+      // Logs de débogage détaillés
+      print('Tentative de connexion:');
+      print('Email: $email');
+      print('Mot de passe haché: $hashedPassword');
+
+      // Vérifiez si la base de données est ouverte
+      print('Base de données ouverte : ${db.isOpen}');
+
+      // Lister tous les utilisateurs pour vérification
+      List<Map<String, dynamic>> allUsers = await db.query('utilisateur');
+      print('Nombre total d\'utilisateurs : ${allUsers.length}');
+
+      // Imprimer tous les emails dans la base de données
+      allUsers.forEach((user) {
+        print('Email existant: ${user['email']}');
+      });
+
+      List<Map<String, dynamic>> resultats = await db.query(
+          'utilisateur',
+          where: 'email = ? AND mot_de_passe = ? AND est_actif = 1',
+          whereArgs: [email, hashedPassword]
+      );
+
+      print('Nombre de résultats: ${resultats.length}');
+      if (resultats.isNotEmpty) {
+        print('Utilisateur trouvé:');
+        print(resultats.first);
+      }
+
+      if (resultats.isNotEmpty) {
+        Utilisateur utilisateur = Utilisateur.fromMap(resultats.first);
+        return utilisateur;
+      }
+      return null;
+    } catch (e) {
+      print('Erreur lors de l\'authentification : $e');
+      return null;
+    }
+  }
+
+  Future<Utilisateur?> obtenirUtilisateurParId(int idUtilisateur) async {
+    final db = await _sqlHelper.baseDeDonnees;
+
     List<Map<String, dynamic>> resultats = await db.query(
         'utilisateur',
-        where: 'email = ? AND mot_de_passe = ? AND est_actif = 1',
-        whereArgs: [email, hashedPassword]
+        where: 'id_utilisateur = ? AND est_actif = 1',
+        whereArgs: [idUtilisateur]
     );
 
     if (resultats.isNotEmpty) {
-      // Mettre à jour la dernière connexion
-      await db.update(
-          'utilisateur',
-          {'derniere_connexion': DateTime.now().toIso8601String()},
-          where: 'id_utilisateur = ?',
-          whereArgs: [resultats.first['id_utilisateur']]
-      );
-
       return Utilisateur.fromMap(resultats.first);
     }
+
     return null;
   }
 

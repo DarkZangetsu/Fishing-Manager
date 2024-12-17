@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <application
-        android:label="peche"
+        android:label="Fisher Manager"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

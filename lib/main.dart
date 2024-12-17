@@ -33,9 +33,14 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -55,8 +60,67 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: AppRoutes.login,
+      home: SplashScreen(),
       onGenerateRoute: AppRoutes.generateRoute,
+    );
+  }
+}
+
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Restaurer la session
+    final utilisateurProvider = Provider.of<UtilisateurProvider>(context, listen: false);
+    utilisateurProvider.restaurerSession();
+
+    Future.delayed(Duration(seconds: 3), () {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/ic_launcher.png',
+              width: 200,
+              height: 200,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Fishing Manager',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Votre compagnon de pêche ultime',
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.secondary,
+              ),
+            ),
+            SizedBox(height: 20),
+            CircularProgressIndicator(
+              color: AppColors.primary,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -19,6 +19,7 @@ class _UserManagementViewState extends State<UserManagementView> {
   UserRole _selectedRole = UserRole.utilisateur;
   bool _isEditing = false;
   Utilisateur? _selectedUser;
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _UserManagementViewState extends State<UserManagementView> {
       _isEditing = false;
       _selectedUser = null;
       _selectedRole = UserRole.utilisateur;
+      _obscurePassword = true;
     });
   }
 
@@ -43,6 +45,7 @@ class _UserManagementViewState extends State<UserManagementView> {
     setState(() {
       _isEditing = user != null;
       _selectedUser = user;
+      _obscurePassword = true;
 
       if (user != null) {
         _nomController.text = user.nomUtilisateur;
@@ -130,13 +133,7 @@ class _UserManagementViewState extends State<UserManagementView> {
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 15),
-          if (!_isEditing)
-            _buildTextField(
-              controller: _passwordController,
-              label: 'Mot de passe',
-              icon: Icons.lock,
-              obscureText: true,
-            ),
+          _buildPasswordTextField(context, setState),
           const SizedBox(height: 15),
           _buildRoleDropdown(setState),
           const SizedBox(height: 20),
@@ -156,17 +153,46 @@ class _UserManagementViewState extends State<UserManagementView> {
     );
   }
 
+  Widget _buildPasswordTextField(BuildContext context, StateSetter setState) {
+    return TextField(
+      controller: _passwordController,
+      keyboardType: TextInputType.text,
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        labelText: _isEditing ? 'Nouveau mot de passe (optionnel)' : 'Mot de passe',
+        prefixIcon: Icon(Icons.lock, color: AppColors.primary),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+            color: AppColors.primary,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: AppColors.primary, width: 2),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
   }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: AppColors.primary),
@@ -225,6 +251,7 @@ class _UserManagementViewState extends State<UserManagementView> {
       nomUtilisateur: _nomController.text,
       email: _emailController.text,
       role: _selectedRole,
+      motDePasse: _passwordController.text, // Conditionally handled in provider
     );
 
     provider.modifierUtilisateur(updatedUser).then((success) {
@@ -252,7 +279,6 @@ class _UserManagementViewState extends State<UserManagementView> {
       }
     });
   }
-
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

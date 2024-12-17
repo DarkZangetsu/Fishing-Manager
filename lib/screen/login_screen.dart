@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 
+import '../models/Utilisateur.dart';
 import '../provider/utilisateurProvider.dart';
 import '../routes/app_routes.dart';
 import '../utils/app_colors.dart';
@@ -34,12 +35,21 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoading = false);
 
       if (success) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+        final currentUser = utilisateurProvider.utilisateurConnecte;
+
+        if (currentUser?.role == UserRole.admin) {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+        } else if (currentUser?.role == UserRole.utilisateur) {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+        } else {
+          _showErrorDialog('Accès non autorisé');
+        }
       } else {
         _showErrorDialog('Identifiants incorrects');
       }
     }
   }
+
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -103,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Welcome Text
                   FadeInUp(
                     child: const Text(
-                      'Phising Manager',
+                      'Fishing Manager',
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
